@@ -2,7 +2,7 @@ require 'matchy/version'
 
 AUTHOR = 'Jeremy McAnally'  # can also be an array of Authors
 EMAIL = "jeremy@entp.com"
-DESCRIPTION = "description of gem"
+DESCRIPTION = "RSpec-esque matchers for use in Test::Unit"
 GEM_NAME = 'matchy' # what ppl will type to install your gem
 RUBYFORGE_PROJECT = 'matchy' # The unix name for your project
 HOMEPATH = "http://#{RUBYFORGE_PROJECT}.rubyforge.org"
@@ -38,7 +38,7 @@ VERS = Matchy::VERSION::STRING + (REV ? ".#{REV}" : "")
 RDOC_OPTS = ['--quiet', '--title', 'matchy documentation',
     "--opname", "index.html",
     "--line-numbers",
-    "--main", "README",
+    "--main", "README.rdoc",
     "--inline-source"]
 
 class Hoe
