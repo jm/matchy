@@ -40,7 +40,7 @@ Hate writing assertions?  Need a little behavior-driven love in your tests?  The
 == INSTALL:
 
     $ gem sources -a http://gems.github.com
-    $ sudo gem install jeremymcanally-context
+    $ sudo gem install jeremymcanally-matchy
 
 == LICENSE:
 
