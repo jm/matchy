@@ -35,9 +35,9 @@ module Matchy
     protected
     def match_expectation(expectation, match)
       if expectation.matches?(self) != match
-        expectation.fail!
+        expectation.fail!(match)
       else
-        expectation.pass!
+        expectation.pass!(match)
       end
     end
   end

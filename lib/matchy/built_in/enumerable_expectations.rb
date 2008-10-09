@@ -45,7 +45,7 @@ module Matchy
       #
       def exclude(*obj)
         Matchy::Expectations::ExcludeExpectation.new(obj, self)
-      end 
+      end
     end
   end
 end

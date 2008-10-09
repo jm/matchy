@@ -22,7 +22,7 @@ class TestExpectationBase < Test::Unit::TestCase
   end
   
   def test_pass
-    @instance.pass!
+    @instance.pass!(true)
   end
   
   def test_failure_message

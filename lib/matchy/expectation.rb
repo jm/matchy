@@ -23,19 +23,24 @@ module Matchy
       end
     
       # Fail the expectation.  Calls flunk on the test case.
-      def fail!
-        @test_case.flunk failure_message
+      def fail!(which)
+        @test_case.flunk (which ? failure_message : negative_failure_message)
       end
       
       # Pass the expectations.  Calls <tt>assert true</tt>.  May want to consider something
       # different here.
-      def pass!
+      def pass!(which)
         @test_case.assert true
       end
       
       # Failure message.  Should be overriden.
       def failure_message
         "OMG FAIL."
+      end
+      
+      # Negative failure message (i.e., for should_not).  Should be overridden.
+      def negative_failure_message
+        "OMG FAIL TO FAIL."
       end
     end
   end
