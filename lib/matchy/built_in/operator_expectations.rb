@@ -14,58 +14,65 @@ module Matchy
       end
 
       def ==(expected)
+        @expected = expected
         if @receiver.send(:==, expected) == @match
           pass!
         else
-          fail!
+          fail!("==")
         end
       end
       
       def ===(expected)
+        @expected = expected
         if @receiver.send(:===, expected) == @match
           pass!
         else
-          fail!
+          fail!("===")
         end
       end
       
       def =~(expected)
+        @expected = expected
         if @receiver.send(:=~, expected).nil? != @match
           pass!
         else
-          fail!
+          fail!("=~")
         end
       end
       
       def >(expected)
+        @expected = expected
         if @receiver.send(:>, expected) == @match
           pass!
         else
-          fail!
+          fail!(">")
         end
       end
       
       def <(expected)
+        @expected = expected
         if @receiver.send(:<, expected) == @match
           pass!
         else
-          fail!
+          fail!("<")
         end
       end
       
       def >=(expected)
+        @expected = expected
         if @receiver.send(:>=, expected) == @match
           pass!
         else
-          fail!
+          fail!(">=")
         end
       end
       
       def <=(expected)
+        @expected = expected
         if @receiver.send(:<=, expected) == @match
           pass!
         else
-          fail!
+          fail!("<=")
         end
       end
       
@@ -74,8 +81,16 @@ module Matchy
         assert true
       end
       
-      def fail!
-        flunk
+      def fail!(operator)
+        flunk failure_message(@match ? failure_message(operator) : negative_failure_message(operator))
+      end
+      
+      def failure_message(operator)
+        "Expected #{@receiver.inspect} to #{operator} #{@expected.inspect}."
+      end
+      
+      def negative_failure_message(operator)
+        "Expected #{@receiver.inspect} to not #{operator} #{@expected.inspect}."
       end
     end
   end

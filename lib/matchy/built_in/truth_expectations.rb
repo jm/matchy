@@ -2,7 +2,17 @@ module Matchy
   module Expectations
     class BeExpectation < Base
       def matches?(receiver)
+        @receiver = receiver
+        
         @expected == receiver
+      end
+      
+      def failure_message
+        "Expected #{@receiver.inspect} to be #{@expected.inspect}."
+      end
+      
+      def negative_failure_message
+        "Expected #{@receiver.inspect} to not be #{@expected.inspect}."
       end
     end
     
@@ -14,7 +24,17 @@ module Matchy
       end
       
       def matches?(receiver)
+        @receiver = receiver
+        
         (receiver - @expected).abs < @delta
+      end
+      
+      def failure_message
+        "Expected #{@receiver.inspect} to be close to #{@expected.inspect} (delta: #{@delta})."
+      end
+      
+      def negative_failure_message
+        "Expected #{@receiver.inspect} to not be close to #{@expected.inspect} (delta: #{@delta})."
       end
     end
     
@@ -24,25 +44,61 @@ module Matchy
       end
       
       def matches?(receiver)
+        @receiver = receiver
         receiver.exist?
+      end
+      
+      def failure_message
+        "Expected #{@receiver.inspect} to exist."
+      end
+      
+      def negative_failure_message
+        "Expected #{@receiver.inspect} to not exist."
       end
     end
     
     class EqlExpectation < Base
       def matches?(receiver)
+        @receiver = receiver
         @expected.eql?(receiver)
+      end
+      
+      def failure_message
+        "Expected #{@receiver.inspect} to eql #{@expected.inspect}."
+      end
+      
+      def negative_failure_message
+        "Expected #{@receiver.inspect} to not eql #{@expected.inspect}."
       end
     end
     
     class EqualExpectation < Base
       def matches?(receiver)
+        @receiver = receiver
         @expected.equal?(receiver)
+      end
+      
+      def failure_message
+        "Expected #{@receiver.inspect} to equal #{@expected.inspect}."
+      end
+      
+      def negative_failure_message
+        "Expected #{@receiver.inspect} to not equal #{@expected.inspect}."
       end
     end
     
     class SatisfyExpectation < Base
       def matches?(receiver)
+        @receiver = receiver
         @expected.call(receiver) == true
+      end
+      
+      def failure_message
+        "Expected #{@receiver.inspect} to satisfy given block."
+      end
+      
+      def negative_failure_message
+        "Expected #{@receiver.inspect} to not satisfy given block."
       end
     end
 

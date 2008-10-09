@@ -64,4 +64,46 @@ class TestErrorExpectations < Test::Unit::TestCase
       }.should_not throw_symbol(:fail)
     }.should raise_error(Test::Unit::AssertionFailedError)
   end
+  
+  def test_error_fail_message
+    obj = raise_error(TypeError)
+    obj.matches?(lambda { raise NameError })
+    
+    obj.failure_message.should =~ /Expected #<(.*)> to raise TypeError, but NameError was raised instead./
+  end
+  
+  def test_error_fail_message_when_no_error
+    obj = raise_error(TypeError)
+    obj.matches?(lambda { "moop" })
+    
+    obj.failure_message.should =~ /Expected #<(.*)> to raise TypeError, but none was raised./
+  end
+  
+  def test_error_negative_fail_message
+    obj = raise_error(TypeError)
+    obj.matches?(lambda { raise TypeError })
+    
+    obj.negative_failure_message.should =~ /Expected #<(.*)> to not raise TypeError./
+  end
+  
+  def test_throw_fail_message
+    obj = throw_symbol(:fail)
+    obj.matches?(lambda { throw :lame })
+    
+    obj.failure_message.should =~ /Expected #<(.*)> to throw :fail, but :lame was thrown instead./
+  end
+  
+  def test_throw_fail_message_when_no_symbol
+    obj = throw_symbol(:fail)
+    obj.matches?(lambda { "moop" })
+    
+    obj.failure_message.should =~ /Expected #<(.*)> to throw :fail, but no symbol was thrown./
+  end
+  
+  def test_throw_negative_fail_message
+    obj = throw_symbol(:fail)
+    obj.matches?(lambda { throw :fail })
+    
+    obj.negative_failure_message.should =~ /Expected #<(.*)> to not throw :fail./
+  end
 end

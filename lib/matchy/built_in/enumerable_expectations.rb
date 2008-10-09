@@ -2,21 +2,39 @@ module Matchy
   module Expectations 
     class IncludeExpectation < Base
       def matches?(receiver)
+        @receiver = receiver
         @expected.each do |o|
           return false unless receiver.include?(o)
         end
         
         true
       end
+      
+      def failure_message
+        "Expected #{@receiver.inspect} to include #{@expected.inspect}."
+      end
+      
+      def negative_failure_message
+        "Expected #{@receiver.inspect} to not include #{@expected.inspect}."
+      end
     end
     
     class ExcludeExpectation < Base
       def matches?(receiver)
+        @receiver = receiver
         @expected.each do |o|
           return false unless !receiver.include?(o)
         end
         
         true
+      end
+      
+      def failure_message
+        "Expected #{@receiver.inspect} to exclude #{@expected.inspect}."
+      end
+      
+      def negative_failure_message
+        "Expected #{@receiver.inspect} to not exclude #{@expected.inspect}."
       end
     end
 

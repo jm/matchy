@@ -24,7 +24,7 @@ module Matchy
     
       # Fail the expectation.  Calls flunk on the test case.
       def fail!(which)
-        @test_case.flunk (which ? failure_message : negative_failure_message)
+        @test_case.flunk(which ? failure_message : negative_failure_message)
       end
       
       # Pass the expectations.  Calls <tt>assert true</tt>.  May want to consider something

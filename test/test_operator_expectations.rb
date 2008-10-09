@@ -134,4 +134,26 @@ class TestOperatorExpectations < Test::Unit::TestCase
       "it's a freak out!".should_not =~ /freak/
     }.should raise_error(Test::Unit::AssertionFailedError)
   end
+  
+  def test_fail_message
+    obj = Matchy::Expectations::OperatorExpectation.new(3, true)
+    
+    def obj.fail!(fail)
+    end
+    
+    obj == 4
+    
+    obj.send(:failure_message, "==").should =~ /Expected 3 to == 4./
+  end
+  
+  def test_negative_fail_message
+    obj = Matchy::Expectations::OperatorExpectation.new(3, true)
+    
+    def obj.fail!(fail)
+    end
+    
+    obj == 3
+    
+    obj.send(:negative_failure_message, "==").should =~ /Expected 3 to not == 3./
+  end
 end
