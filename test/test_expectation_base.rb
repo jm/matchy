@@ -21,8 +21,8 @@ class TestExpectationBase < Test::Unit::TestCase
     }.should raise_error(Test::Unit::AssertionFailedError)
   end
   
-  def test_succeed
-    @instance.succeed!
+  def test_pass
+    @instance.pass!
   end
   
   def test_failure_message

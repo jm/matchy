@@ -37,7 +37,7 @@ module Matchy
       if expectation.matches?(self) != match
         expectation.fail!
       else
-        expectation.succeed!
+        expectation.pass!
       end
     end
   end

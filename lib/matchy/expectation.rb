@@ -29,9 +29,7 @@ module Matchy
       
       # Pass the expectations.  Calls <tt>assert true</tt>.  May want to consider something
       # different here.
-      #
-      # TODO: Perhaps rename to +pass!+?
-      def succeed!
+      def pass!
         @test_case.assert true
       end
       
