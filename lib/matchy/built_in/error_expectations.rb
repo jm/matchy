@@ -1,12 +1,12 @@
 module Matchy
   module Expectations
     class RaiseErrorExpectation < Base
-      def matches?(obj)
+      def matches?(receiver)
         begin
-          obj.call
+          receiver.call
           return false
         rescue StandardError => e
-          return false unless e.class.ancestors.include?(@object)
+          return false unless e.class.ancestors.include?(@expected)
         
           return true
         end
@@ -14,14 +14,14 @@ module Matchy
     end
     
     class ThrowSymbolExpectation < Base
-      def matches?(obj)
+      def matches?(receiver)
         begin
-          obj.call
+          receiver.call
         rescue NameError => e
           raise e unless e.message =~ /uncaught throw/
           thrown_symbol = e.name.to_sym
         ensure
-          return @object == thrown_symbol
+          return @expected == thrown_symbol
         end
       end
     end

@@ -1,20 +1,20 @@
 module Matchy
   module Expectations
     class BeExpectation < Base
-      def matches?(obj)
-        @object == obj
+      def matches?(receiver)
+        @expected == receiver
       end
     end
     
     class BeCloseExpectation < Base
-      def initialize(obj, delta, test_case)
-        @object = obj
+      def initialize(expected, delta, test_case)
+        @expected = expected
         @test_case = test_case
         @delta = delta
       end
       
-      def matches?(obj)
-        (obj - @object).abs < @delta
+      def matches?(receiver)
+        (receiver - @expected).abs < @delta
       end
     end
     
@@ -23,26 +23,26 @@ module Matchy
         @test_case = test_case
       end
       
-      def matches?(obj)
-        obj.exist?
+      def matches?(receiver)
+        receiver.exist?
       end
     end
     
     class EqlExpectation < Base
-      def matches?(obj)
-        @object.eql?(obj)
+      def matches?(receiver)
+        @expected.eql?(receiver)
       end
     end
     
     class EqualExpectation < Base
-      def matches?(obj)
-        @object.equal?(obj)
+      def matches?(receiver)
+        @expected.equal?(receiver)
       end
     end
     
     class SatisfyExpectation < Base
-      def matches?(obj)
-        @object.call(obj) == true
+      def matches?(receiver)
+        @expected.call(receiver) == true
       end
     end
 

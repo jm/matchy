@@ -8,61 +8,61 @@ module Matchy
     #   "hello".length.should_not == 2
     #
     class OperatorExpectation < Base      
-      def initialize(obj, match)
-        @object = obj
+      def initialize(receiver, match)
+        @receiver = receiver
         @match = match
       end
 
-      def ==(obj)
-        if @object.send(:==, obj) == @match
+      def ==(expected)
+        if @receiver.send(:==, expected) == @match
           pass!
         else
           fail!
         end
       end
       
-      def ===(obj)
-        if @object.send(:===, obj) == @match
+      def ===(expected)
+        if @receiver.send(:===, expected) == @match
           pass!
         else
           fail!
         end
       end
       
-      def =~(obj)
-        if @object.send(:=~, obj).nil? != @match
+      def =~(expected)
+        if @receiver.send(:=~, expected).nil? != @match
           pass!
         else
           fail!
         end
       end
       
-      def >(obj)
-        if @object.send(:>, obj) == @match
+      def >(expected)
+        if @receiver.send(:>, expected) == @match
           pass!
         else
           fail!
         end
       end
       
-      def <(obj)
-        if @object.send(:<, obj) == @match
+      def <(expected)
+        if @receiver.send(:<, expected) == @match
           pass!
         else
           fail!
         end
       end
       
-      def >=(obj)
-        if @object.send(:>=, obj) == @match
+      def >=(expected)
+        if @receiver.send(:>=, expected) == @match
           pass!
         else
           fail!
         end
       end
       
-      def <=(obj)
-        if @object.send(:<=, obj) == @match
+      def <=(expected)
+        if @receiver.send(:<=, expected) == @match
           pass!
         else
           fail!

@@ -1,9 +1,9 @@
 module Matchy
   module Expectations 
     class IncludeExpectation < Base
-      def matches?(obj)
-        @object.each do |o|
-          return false unless obj.include?(o)
+      def matches?(receiver)
+        @expected.each do |o|
+          return false unless receiver.include?(o)
         end
         
         true
@@ -11,9 +11,9 @@ module Matchy
     end
     
     class ExcludeExpectation < Base
-      def matches?(obj)
-        @object.each do |o|
-          return false unless !obj.include?(o)
+      def matches?(receiver)
+        @expected.each do |o|
+          return false unless !receiver.include?(o)
         end
         
         true

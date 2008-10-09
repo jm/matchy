@@ -92,9 +92,7 @@ class TestTruthExpectations < Test::Unit::TestCase
   end
   
   def test_be_close
-    lambda {
-      true.should_not be(true)
-    }.should raise_error(Test::Unit::AssertionFailedError)
+    (5.0 - 2.0).should be_close(3.0)
   end
   
   def test_satisfy
