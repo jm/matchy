@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
   	"Manifest.txt", 
   	"README.rdoc", 
   	"Rakefile", 
-  	"context.gemspec", 
+  	"matchy.gemspec", 
     "History.txt",
     "License.txt",
     "Manifest.txt",
@@ -34,11 +34,12 @@ Gem::Specification.new do |s|
   ]
   
   s.test_files = [
-    "test/test_context.rb",
-    "test/test_core_ext.rb",
-    "test/test_lifecycle.rb",
-    "test/test_test.rb",
-    "test/test_helper.rb"
+    "test/test_enumerable_expectations.rb",
+    "test/test_error_expectations.rb",
+    "test/test_expectation_base.rb",
+    "test/test_operator_expectations.rb",
+    "test/test_truth_expectations.rb",
+    "test/test_modals.rb"
   ]
 
   s.rdoc_options = ["--main", "README.rdoc"]
