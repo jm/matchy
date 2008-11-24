@@ -25,7 +25,7 @@ Gem::Specification.new do |s|
     "lib/matchy.rb",
     "lib/matchy/version.rb",
     "lib/matchy/expectation.rb",
-    "lib/matchy/models.rb",
+    "lib/matchy/modals.rb",
     "lib/matchy/built_in/enumerable_expectations.rb",
     "lib/matchy/built_in/error_expectations.rb",
     "lib/matchy/built_in/operator_expectations.rb",
