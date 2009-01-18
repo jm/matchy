@@ -16,6 +16,21 @@ module Matchy
       end
     end
     
+    class BeKindOfExpectation < Base
+      def matches?(receiver)
+        @receiver = receiver
+        @receiver.kind_of?(@expected)
+      end
+      
+      def failure_message
+        "Expected #{@receiver.inspect} to be kind of #{@expected.inspect}."
+      end
+      
+      def negative_failure_message
+        "Expected #{@receiver.inspect} to not be kind of #{@expected.inspect}."
+      end
+    end
+    
     class BeCloseExpectation < Base
       def initialize(expected, delta, test_case)
         @expected = expected
@@ -102,6 +117,21 @@ module Matchy
       end
     end
 
+    class RespondToExpectation < Base
+      def matches?(receiver)
+        @receiver = receiver
+        @receiver.respond_to?(@expected)
+      end
+      
+      def failure_message
+        "Expected #{@receiver.inspect} to respond to #{@expected.inspect}."
+      end
+      
+      def negative_failure_message
+        "Expected #{@receiver.inspect} to not respond to #{@expected.inspect}."
+      end
+    end
+    
     module TestCaseExtensions
       # Simply checks if the receiver matches the expected object.
       # TODO: Fill this out to implement much of the RSpec functionality (and then some)
@@ -113,6 +143,16 @@ module Matchy
       #
       def be(obj)
         Matchy::Expectations::BeExpectation.new(obj, self)
+      end
+      
+      # Checks if the given object is kind_of? the expected class
+      #
+      # ==== Examples
+      # 
+      #   "hello".should be_kind_of(String)
+      #   3.should be_kind_of(Fixnum)
+      def be_kind_of(klass)
+        Matchy::Expectations::BeKindOfExpectation.new(klass, self)
       end
       
       # Checks if the given object is within a given object and delta.
@@ -175,7 +215,17 @@ module Matchy
       #
       def satisfy(obj)
         Matchy::Expectations::SatisfyExpectation.new(obj, self)
-      end       
+      end
+      
+      # Checks if the given object responds to the given method
+      #
+      # ==== Examples
+      #
+      #   "foo".should respond_to(:length)
+      #   {}.should respond_to(:has_key?)
+      def respond_to(meth)
+        Matchy::Expectations::RespondToExpectation.new(meth, self)
+      end   
     end
   end
 end

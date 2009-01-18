@@ -214,4 +214,45 @@ class TestTruthExpectations < Test::Unit::TestCase
     
     obj.negative_failure_message.should be "Expected 4 to not satisfy given block."
   end
+  
+  def test_kind_of
+    3.should be_kind_of(Fixnum)
+  end
+  
+  def test_kind_of_fail
+    lambda {
+      3.should be_kind_of(Hash)
+    }.should raise_error(Test::Unit::AssertionFailedError)
+  end
+  
+  def test_negative_kind_of
+    3.should_not be_kind_of(Hash)
+  end
+  
+  def test_negative_kind_of_fail
+    lambda {
+      3.should_not be_kind_of(Fixnum)
+    }.should raise_error(Test::Unit::AssertionFailedError)
+  end
+
+  def test_respond_to
+    "foo".should respond_to?(:length)
+  end
+  
+  def test_kind_of_fail
+    lambda {
+      "foo".should respond_to?(:nonexistant_method)
+    }.should raise_error(Test::Unit::AssertionFailedError)
+  end
+  
+  def test_negative_kind_of
+    "foo".should_not respond_to?(:nonexistant_method)
+  end
+  
+  def test_negative_kind_of_fail
+    lambda {
+      "foo".should_not respond_to?(:length)
+    }.should raise_error(Test::Unit::AssertionFailedError)
+  end
+
 end
