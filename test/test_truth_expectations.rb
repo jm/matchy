@@ -236,22 +236,22 @@ class TestTruthExpectations < Test::Unit::TestCase
   end
 
   def test_respond_to
-    "foo".should respond_to?(:length)
+    "foo".should respond_to(:length)
   end
   
   def test_respond_to_fail
     lambda {
-      "foo".should respond_to?(:nonexistant_method)
+      "foo".should respond_to(:nonexistant_method)
     }.should raise_error(Test::Unit::AssertionFailedError)
   end
   
   def test_negative_respond_to
-    "foo".should_not respond_to?(:nonexistant_method)
+    "foo".should_not respond_to(:nonexistant_method)
   end
   
   def test_negative_respond_to_fail
     lambda {
-      "foo".should_not respond_to?(:length)
+      "foo".should_not respond_to(:length)
     }.should raise_error(Test::Unit::AssertionFailedError)
   end
 
