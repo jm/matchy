@@ -1,6 +1,11 @@
 module Matchy
   module Expectations
     class RaiseErrorExpectation < Base
+      def initialize(expected, test_case)
+        @error = nil
+        super
+      end
+
       def matches?(receiver)
         @receiver = receiver
         begin
@@ -31,6 +36,11 @@ module Matchy
     end
     
     class ThrowSymbolExpectation < Base
+      def initialize(expected, test_case)
+        @thrown_symbol = nil
+        super
+      end
+
       def matches?(receiver)
         @receiver = receiver
         begin
