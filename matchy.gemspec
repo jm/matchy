@@ -18,7 +18,6 @@ Gem::Specification.new do |s|
     "License.txt",
     "Manifest.txt",
     "PostInstall.txt",
-    "README.markdown",
     "Rakefile",
     "config/hoe.rb",
     "config/requirements.rb",
