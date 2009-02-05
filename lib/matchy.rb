@@ -7,6 +7,7 @@ require 'test/unit'
 require 'matchy/expectation'
 require 'matchy/modals'
 require 'matchy/version'
+require 'matchy/def_matcher'
 
 require 'matchy/built_in/enumerable_expectations'
 require 'matchy/built_in/error_expectations'
@@ -14,3 +15,6 @@ require 'matchy/built_in/truth_expectations'
 require 'matchy/built_in/operator_expectations'
 
 Test::Unit::TestCase.send(:include, Matchy::Expectations::TestCaseExtensions)
+
+include Matchy::DefMatcher
+
