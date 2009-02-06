@@ -29,7 +29,7 @@ class TestDefMatcher < Test::Unit::TestCase
     def_matcher :matcher do |given, matcher, args|
       true
     end
-    lambda {1.should matcher}.should_not raise_error
+    1.should matcher
   end
   
   def test_fail_negative
@@ -43,7 +43,7 @@ class TestDefMatcher < Test::Unit::TestCase
     def_matcher :matcher do |given, matcher, args|
       false
     end
-    lambda {1.should_not matcher}.should_not raise_error
+    1.should_not matcher
   end
   
   def test_takes_arguments

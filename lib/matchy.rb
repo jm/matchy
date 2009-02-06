@@ -7,6 +7,7 @@ require 'test/unit'
 require 'matchy/expectation'
 require 'matchy/modals'
 require 'matchy/version'
+require 'matchy/matcher_builder'
 require 'matchy/def_matcher'
 
 require 'matchy/built_in/enumerable_expectations'
