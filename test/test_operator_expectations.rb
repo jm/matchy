@@ -43,7 +43,7 @@ class TestOperatorExpectations < Test::Unit::TestCase
     }.should raise_error(Test::Unit::AssertionFailedError)
   end 
   
-  # GREATER THAN (<)
+  # GREATER THAN (>)
   def test_greater_than
     3.should > 2
   end
@@ -89,7 +89,7 @@ class TestOperatorExpectations < Test::Unit::TestCase
     }.should raise_error(Test::Unit::AssertionFailedError)
   end
   
-  # GREATER THAN EQUALS (<=)
+  # GREATER THAN EQUALS (>=)
   def test_greater_than_equal
     3.should >= 2
   end

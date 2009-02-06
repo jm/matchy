@@ -141,7 +141,33 @@ module Matchy
           matcher.negative_msg = "Expected #{@receiver.inspect} to not respond to #{@expected.inspect}."
           @receiver.respond_to?(@expected)
         end
-      end   
+      end
+
+      alias_method :old_missing, :method_missing
+      # ==be_*something*
+      #
+      # ===This method_missing acts as a matcher builder. 
+      # If a call to be_xyz() reaches this method_missing (say: obj.should be_xyz), 
+      # a matcher with the name xyz will be built, whose defining property
+      # is that it returns the value of obj.xyz? for matches?.
+      # ==== Examples
+      #
+      #   nil.should be_nil
+      #   obj.something? #=> true
+      #   obj.should be_something
+      def method_missing(name, *args, &block)
+        if (name.to_s =~ /^be_(.+)/)
+          build_matcher(name, args) do |receiver, matcher, args|
+            @receiver = receiver
+            
+            matcher.positive_msg = "Expected #{@receiver.inspect} to return true for #{$1}?."
+            matcher.negative_msg = "Expected #{@receiver.inspect} to return false for #{$1}?."
+            @receiver.send(($1 + "?").to_sym)
+          end
+        else
+          old_missing(name, *args, &block)
+        end
+      end
     end
   end
 end

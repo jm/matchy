@@ -11,6 +11,11 @@ class Exister
 end
 
 class TestTruthExpectations < Test::Unit::TestCase
+  
+  def setup
+    @obj = Object.new
+  end
+  
   def test_equal
     3.should equal(3)
   end
@@ -261,6 +266,56 @@ class TestTruthExpectations < Test::Unit::TestCase
     lambda {
       "foo".should_not respond_to(:length)
     }.should raise_error(Test::Unit::AssertionFailedError)
+  end
+  
+  def test_positive_be_something_method_missing_pass
+    def @obj.something?
+      true
+    end
+    @obj.should be_something
+  end
+  
+  def test_positive_be_something_method_missing_fails
+    def @obj.something?
+      false
+    end
+    lambda {@obj.should be_something}.should raise_error(Test::Unit::AssertionFailedError)
+  end
+  
+  def test_negative_be_something_method_missing_pass
+    def @obj.something?
+      false
+    end
+    @obj.should_not be_something
+  end
+  
+  def test_negative_be_something_method_missing_fails
+    def @obj.something?
+      true
+    end
+    lambda {@obj.should_not be_something}.should raise_error(Test::Unit::AssertionFailedError)
+  end
+  
+  def test_be_something_method_missing_fail_message
+    obj = "foo"
+    def obj.something?
+      true
+    end
+    matcher_obj = be_something
+    obj.should matcher_obj
+    
+    matcher_obj.failure_message.should be("Expected \"foo\" to return true for something?.")
+  end
+  
+  def test_be_something_method_missing_negative_fail_message
+    obj = "foo"
+    def obj.something?
+      false
+    end
+    matcher_obj = be_something
+    obj.should_not matcher_obj
+    
+    matcher_obj.negative_failure_message.should be("Expected \"foo\" to return false for something?.")
   end
 
 end
