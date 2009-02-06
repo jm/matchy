@@ -37,6 +37,10 @@ class TestTruthExpectations < Test::Unit::TestCase
     3.should eql(3)
   end
   
+  def test_eql_array
+    [1,2,3].should eql([1,2,3])
+  end
+  
   def test_negative_eql
     3.should_not eql(9)
   end
@@ -79,6 +83,10 @@ class TestTruthExpectations < Test::Unit::TestCase
   
   def test_be
     true.should be(true)
+  end
+  
+  def test_be_array
+    [1,2,3].should be([1,2,3])
   end
   
   def test_negative_be

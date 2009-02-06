@@ -2,8 +2,8 @@ require File.dirname(__FILE__) + '/test_helper.rb'
 
 class TestModals < Test::Unit::TestCase
   def setup
-    @expectation = Matchy::Expectations::EqlExpectation.new(3, self)
-    @bad_expectation = Matchy::Expectations::EqlExpectation.new(4, self)
+    @expectation = build_matcher() {|r,m,a| true}
+    @bad_expectation = build_matcher() {|r,m,a| false}
   end
   
   def test_should

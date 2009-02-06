@@ -1,6 +1,7 @@
 module Matchy
   module MatcherBuilder
     def build_matcher(matcher_name=nil, args=[], &block)
+      #args = [args] #unless args.kind_of?(Array)
       match_block = lambda do |actual, matcher|
         block.call(actual, matcher, args)
       end

@@ -1,137 +1,5 @@
 module Matchy
   module Expectations
-    class BeExpectation < Base
-      def matches?(receiver)
-        @receiver = receiver
-        
-        @expected == receiver
-      end
-      
-      def failure_message
-        "Expected #{@receiver.inspect} to be #{@expected.inspect}."
-      end
-      
-      def negative_failure_message
-        "Expected #{@receiver.inspect} to not be #{@expected.inspect}."
-      end
-    end
-    
-    class BeKindOfExpectation < Base
-      def matches?(receiver)
-        @receiver = receiver
-        @receiver.kind_of?(@expected)
-      end
-      
-      def failure_message
-        "Expected #{@receiver.inspect} to be kind of #{@expected.inspect}."
-      end
-      
-      def negative_failure_message
-        "Expected #{@receiver.inspect} to not be kind of #{@expected.inspect}."
-      end
-    end
-    
-    class BeCloseExpectation < Base
-      def initialize(expected, delta, test_case)
-        @expected = expected
-        @test_case = test_case
-        @delta = delta
-      end
-      
-      def matches?(receiver)
-        @receiver = receiver
-        
-        (receiver - @expected).abs < @delta
-      end
-      
-      def failure_message
-        "Expected #{@receiver.inspect} to be close to #{@expected.inspect} (delta: #{@delta})."
-      end
-      
-      def negative_failure_message
-        "Expected #{@receiver.inspect} to not be close to #{@expected.inspect} (delta: #{@delta})."
-      end
-    end
-    
-    class ExistExpectation < Base
-      def initialize(test_case)
-        @test_case = test_case
-      end
-      
-      def matches?(receiver)
-        @receiver = receiver
-        receiver.exist?
-      end
-      
-      def failure_message
-        "Expected #{@receiver.inspect} to exist."
-      end
-      
-      def negative_failure_message
-        "Expected #{@receiver.inspect} to not exist."
-      end
-    end
-    
-    class EqlExpectation < Base
-      def matches?(receiver)
-        @receiver = receiver
-        @expected.eql?(receiver)
-      end
-      
-      def failure_message
-        "Expected #{@receiver.inspect} to eql #{@expected.inspect}."
-      end
-      
-      def negative_failure_message
-        "Expected #{@receiver.inspect} to not eql #{@expected.inspect}."
-      end
-    end
-    
-    class EqualExpectation < Base
-      def matches?(receiver)
-        @receiver = receiver
-        @expected.equal?(receiver)
-      end
-      
-      def failure_message
-        "Expected #{@receiver.inspect} to equal #{@expected.inspect}."
-      end
-      
-      def negative_failure_message
-        "Expected #{@receiver.inspect} to not equal #{@expected.inspect}."
-      end
-    end
-    
-    class SatisfyExpectation < Base
-      def matches?(receiver)
-        @receiver = receiver
-        @expected.call(receiver) == true
-      end
-      
-      def failure_message
-        "Expected #{@receiver.inspect} to satisfy given block."
-      end
-      
-      def negative_failure_message
-        "Expected #{@receiver.inspect} to not satisfy given block."
-      end
-    end
-
-    class RespondToExpectation < Base
-      def matches?(receiver)
-        @receiver = receiver
-        @receiver.respond_to?(@expected)
-      end
-      
-      def failure_message
-        "Expected #{@receiver.inspect} to respond to #{@expected.inspect}."
-      end
-      
-      def negative_failure_message
-        "Expected #{@receiver.inspect} to not respond to #{@expected.inspect}."
-      end
-    end
-    
     module TestCaseExtensions
       # Simply checks if the receiver matches the expected object.
       # TODO: Fill this out to implement much of the RSpec functionality (and then some)
@@ -141,8 +9,14 @@ module Matchy
       #   "hello".should be("hello")
       #   (13 < 20).should be(true)
       #
-      def be(obj)
-        Matchy::Expectations::BeExpectation.new(obj, self)
+      def be(*obj)
+        build_matcher(:be, obj) do |receiver, matcher, args|
+          @receiver = receiver
+          @expected = args[0]
+          matcher.positive_msg = "Expected #{@receiver.inspect} to be #{@expected.inspect}."
+          matcher.negative_msg = "Expected #{@receiver.inspect} to not be #{@expected.inspect}."
+          @expected == @receiver
+        end
       end
       
       # Checks if the given object is kind_of? the expected class
@@ -151,8 +25,14 @@ module Matchy
       # 
       #   "hello".should be_kind_of(String)
       #   3.should be_kind_of(Fixnum)
-      def be_kind_of(klass)
-        Matchy::Expectations::BeKindOfExpectation.new(klass, self)
+      def be_kind_of(*klass)
+        build_matcher(:be_kind_of, klass) do |receiver, matcher, args|
+          @receiver = receiver
+          @expected = args[0]
+          matcher.positive_msg = "Expected #{@receiver.inspect} to be kind of #{@expected.inspect}."
+          matcher.negative_msg = "Expected #{@receiver.inspect} to not be kind of #{@expected.inspect}."
+          @receiver.kind_of?(@expected)
+        end
       end
       
       # Checks if the given object is within a given object and delta.
@@ -163,7 +43,14 @@ module Matchy
       #   (13.0 - 4.0).should be_close(9.0, 0.5)
       #
       def be_close(obj, delta = 0.3)
-        Matchy::Expectations::BeCloseExpectation.new(obj, delta, self)
+        build_matcher(:be_close, [obj, delta]) do |receiver, matcher, args|
+          @receiver = receiver
+          @expected = args[0]
+          @delta = args[1]
+          matcher.positive_msg = "Expected #{@receiver.inspect} to be close to #{@expected.inspect} (delta: #{@delta})."
+          matcher.negative_msg = "Expected #{@receiver.inspect} to not be close to #{@expected.inspect} (delta: #{@delta})."
+          (@receiver - @expected).abs < @delta
+        end
       end
       
       # Calls +exist?+ on the given object.
@@ -174,7 +61,12 @@ module Matchy
       #   found_user.should exist
       #
       def exist
-        Matchy::Expectations::ExistExpectation.new(self)
+        build_matcher(:exist) do |receiver, matcher, args|
+          @receiver = receiver
+          matcher.positive_msg = "Expected #{@receiver.inspect} to exist."
+          matcher.negative_msg = "Expected #{@receiver.inspect} to not exist."
+          receiver.exist?
+        end
       end   
       
       # Calls +eql?+ on the given object (i.e., are the objects the same value?)
@@ -184,8 +76,14 @@ module Matchy
       #    1.should_not eql(1.0)
       #    (12 / 6).should eql(6)
       #
-      def eql(obj)
-        Matchy::Expectations::EqlExpectation.new(obj, self)
+      def eql(*obj)
+        build_matcher(:eql, obj) do |receiver, matcher, args|
+          @receiver = receiver
+          @expected = args[0]
+          matcher.positive_msg = "Expected #{@receiver.inspect} to eql #{@expected.inspect}."
+          matcher.negative_msg = "Expected #{@receiver.inspect} to not eql #{@expected.inspect}."
+          @expected.eql?(@receiver)
+        end
       end
       
       # Calls +equal?+ on the given object (i.e., do the two objects have the same +object_id+?)
@@ -201,8 +99,14 @@ module Matchy
       #   # The same object_id
       #   x[0].should equal(y[0])
       #
-      def equal(obj)
-        Matchy::Expectations::EqualExpectation.new(obj, self)
+      def equal(*obj)
+        build_matcher(:equal, obj) do |receiver, matcher, args|
+          @receiver = receiver
+          @expected = args[0]
+          matcher.positive_msg = "Expected #{@receiver.inspect} to equal #{@expected.inspect}."
+          matcher.negative_msg = "Expected #{@receiver.inspect} to not equal #{@expected.inspect}."
+          @expected.equal?(@receiver)
+        end
       end
       
       # A last ditch way to implement your testing logic.  You probably shouldn't use this unless you
@@ -213,8 +117,14 @@ module Matchy
       #   (13 - 4).should satisfy(lambda {|i| i < 20})
       #   "hello".should_not satisfy(lambda {|s| s =~ /hi/})
       #
-      def satisfy(obj)
-        Matchy::Expectations::SatisfyExpectation.new(obj, self)
+      def satisfy(*obj)
+        build_matcher(:satisfy, obj) do |receiver, matcher, args|
+          @receiver = receiver
+          @expected = args[0]
+          matcher.positive_msg = "Expected #{@receiver.inspect} to satisfy given block."
+          matcher.negative_msg = "Expected #{@receiver.inspect} to not satisfy given block."
+          @expected.call(@receiver) == true
+        end
       end
       
       # Checks if the given object responds to the given method
@@ -223,8 +133,14 @@ module Matchy
       #
       #   "foo".should respond_to(:length)
       #   {}.should respond_to(:has_key?)
-      def respond_to(meth)
-        Matchy::Expectations::RespondToExpectation.new(meth, self)
+      def respond_to(*meth)
+        build_matcher(:respond_to, meth) do |receiver, matcher, args|
+          @receiver = receiver
+          @expected = args[0]
+          matcher.positive_msg = "Expected #{@receiver.inspect} to respond to #{@expected.inspect}."
+          matcher.negative_msg = "Expected #{@receiver.inspect} to not respond to #{@expected.inspect}."
+          @receiver.respond_to?(@expected)
+        end
       end   
     end
   end

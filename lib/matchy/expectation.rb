@@ -3,7 +3,7 @@ module Matchy
     # Base class for all expectations.  Inheriting from this DRYs up a lot of the
     # constructor logic, etc.
     #
-    # TODO: Implement failure messages, inluding negative failure messages.  Also,
+    # TODO: Implement failure messages, including negative failure messages.  Also,
     # need to name variables/parameters to go with testing nomenclature (expected rather
     # than just "object").
     class Base

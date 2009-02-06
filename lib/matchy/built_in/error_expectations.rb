@@ -1,67 +1,5 @@
 module Matchy
   module Expectations
-    class RaiseErrorExpectation < Base
-      def initialize(expected, test_case)
-        @error = nil
-        super
-      end
-
-      def matches?(receiver)
-        @receiver = receiver
-        begin
-          receiver.call
-          return false
-        rescue StandardError => e
-          @error = e
-          return false unless e.class.ancestors.include?(@expected)
-        
-          return true
-        end
-      end
-      
-      def failure_message
-        extra = ""
-        if @error
-          extra = "but #{@error.class.name} was raised instead"
-        else
-          extra = "but none was raised"
-        end
-        
-        "Expected #{@receiver.inspect} to raise #{@expected.name}, #{extra}."
-      end
-      
-      def negative_failure_message
-        "Expected #{@receiver.inspect} to not raise #{@expected.name}."
-      end
-    end
-    
-    class ThrowSymbolExpectation < Base
-      def initialize(expected, test_case)
-        @thrown_symbol = nil
-        super
-      end
-
-      def matches?(receiver)
-        @receiver = receiver
-        begin
-          receiver.call
-        rescue NameError => e
-          raise e unless e.message =~ /uncaught throw/
-          @thrown_symbol = e.name.to_sym
-        ensure
-          return @expected == @thrown_symbol
-        end
-      end
-      
-      def failure_message
-        "Expected #{@receiver.inspect} to throw :#{@expected}, but #{@thrown_symbol ? ':' + @thrown_symbol.to_s + ' was thrown instead' : 'no symbol was thrown'}."
-      end
-      
-      def negative_failure_message
-        "Expected #{@receiver.inspect} to not throw :#{@expected}."
-      end
-    end
-
     module TestCaseExtensions
       # Expects a lambda to raise an error.  You can specify the error or leave it blank to encompass
       # any error.
@@ -71,8 +9,23 @@ module Matchy
       #   lambda { raise "FAILURE." }.should raise_error
       #   lambda { puts i_dont_exist }.should raise_error(NameError)
       #
-      def raise_error(obj = StandardError)
-        Matchy::Expectations::RaiseErrorExpectation.new(obj, self)
+      def raise_error(*obj)
+        build_matcher(:raise_error, obj) do |given, matcher, args|
+          raised = false
+          error = nil
+          begin
+            given.call
+          rescue StandardError => e
+            raised = true
+            error = e
+          end
+          extra = "but none was raised"
+          extra = "but #{error.class.name} was raised instead" if error
+          expected_error = args[0] || StandardError
+          matcher.positive_msg = "Expected #{given.inspect} to raise #{expected_error.name}, #{extra}."
+          matcher.negative_msg = "Expected #{given.inspect} to not raise #{expected_error.name}."
+          raised && error.class.ancestors.include?(expected_error)
+        end
       end
       
       # Expects a lambda to throw an error.
@@ -82,8 +35,25 @@ module Matchy
       #   lambda { throw :thing }.should throw_symbol(:thing)
       #   lambda { "not this time" }.should_not throw_symbol(:hello)
       #
-      def throw_symbol(obj)
-        Matchy::Expectations::ThrowSymbolExpectation.new(obj, self)
+      def throw_symbol(*obj)
+        build_matcher(:throw_symbol, obj) do |given, matcher, args|
+          raised = false
+          thrown_symbol = nil
+          begin
+            given.call
+          rescue NameError => e
+            raise e unless e.message =~ /uncaught throw/
+            raised = true
+            thrown_symbol = e.name.to_sym
+          end
+          expected = args[0]
+          matcher.positive_msg = <<-END
+Expected #{given.inspect} to throw :#{expected}, but \
+#{thrown_symbol ? ':' + thrown_symbol.to_s + ' was thrown instead' : 'no symbol was thrown'}.
+END
+          matcher.negative_msg = "Expected #{given.inspect} to not throw :#{expected}."
+          expected == thrown_symbol
+        end
       end      
     end
   end

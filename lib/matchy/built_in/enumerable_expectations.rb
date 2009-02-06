@@ -1,44 +1,7 @@
 module Matchy
   module Expectations 
-    class IncludeExpectation < Base
-      def matches?(receiver)
-        @receiver = receiver
-        @expected.each do |o|
-          return false unless receiver.include?(o)
-        end
-        
-        true
-      end
-      
-      def failure_message
-        "Expected #{@receiver.inspect} to include #{@expected.inspect}."
-      end
-      
-      def negative_failure_message
-        "Expected #{@receiver.inspect} to not include #{@expected.inspect}."
-      end
-    end
-    
-    class ExcludeExpectation < Base
-      def matches?(receiver)
-        @receiver = receiver
-        @expected.each do |o|
-          return false unless !receiver.include?(o)
-        end
-        
-        true
-      end
-      
-      def failure_message
-        "Expected #{@receiver.inspect} to exclude #{@expected.inspect}."
-      end
-      
-      def negative_failure_message
-        "Expected #{@receiver.inspect} to not exclude #{@expected.inspect}."
-      end
-    end
-
     module TestCaseExtensions
+      
       # Calls +include?+ on the receiver for any object.  You can also provide
       # multiple arguments to see if all of them are included.
       #
@@ -49,7 +12,11 @@ module Matchy
       #   ['a', 'b', 'c'].should include('a', 'c')
       #
       def include(*obj)
-        Matchy::Expectations::IncludeExpectation.new(obj, self)
+        build_matcher(:include, obj) do |given, matcher, args|
+          matcher.positive_msg = "Expected #{given.inspect} to include #{args.inspect}."
+          matcher.negative_msg = "Expected #{given.inspect} to not include #{args.inspect}."
+          args.inject(true) {|m,o| m && given.include?(o) }
+        end
       end
       
       # Expects the receiver to exclude the given object(s). You can provide
@@ -62,7 +29,11 @@ module Matchy
       #   ['a', 'b', 'c'].should exclude('e', 'f', 'g')
       #
       def exclude(*obj)
-        Matchy::Expectations::ExcludeExpectation.new(obj, self)
+        build_matcher(:exlude, obj) do |given, matcher, args|
+          matcher.positive_msg = "Expected #{given.inspect} to exclude #{args.inspect}."
+          matcher.negative_msg = "Expected #{given.inspect} to not exclude #{args.inspect}."
+          args.inject(true) {|m,o| m && !given.include?(o) }
+        end
       end
     end
   end

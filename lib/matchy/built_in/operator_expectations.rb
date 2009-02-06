@@ -7,72 +7,18 @@ module Matchy
     #   13.should == 13
     #   "hello".length.should_not == 2
     #
-    class OperatorExpectation < Base      
+    class OperatorExpectation < Base 
+      OPERATORS = ['==', '===', '=~', '>', '>=', '<', '<=']
+           
       def initialize(receiver, match)
         @receiver = receiver
         @match = match
       end
-
-      def ==(expected)
-        @expected = expected
-        if @receiver.send(:==, expected) == @match
-          pass!
-        else
-          fail!("==")
-        end
-      end
       
-      def ===(expected)
-        @expected = expected
-        if @receiver.send(:===, expected) == @match
-          pass!
-        else
-          fail!("===")
-        end
-      end
-      
-      def =~(expected)
-        @expected = expected
-        if @receiver.send(:=~, expected).nil? != @match
-          pass!
-        else
-          fail!("=~")
-        end
-      end
-      
-      def >(expected)
-        @expected = expected
-        if @receiver.send(:>, expected) == @match
-          pass!
-        else
-          fail!(">")
-        end
-      end
-      
-      def <(expected)
-        @expected = expected
-        if @receiver.send(:<, expected) == @match
-          pass!
-        else
-          fail!("<")
-        end
-      end
-      
-      def >=(expected)
-        @expected = expected
-        if @receiver.send(:>=, expected) == @match
-          pass!
-        else
-          fail!(">=")
-        end
-      end
-      
-      def <=(expected)
-        @expected = expected
-        if @receiver.send(:<=, expected) == @match
-          pass!
-        else
-          fail!("<=")
+      OPERATORS.each do |op|
+        define_method(op) do |expected|
+          @expected = expected
+          (@receiver.send(op,expected) ? true : false) == @match ? pass! : fail!(op)
         end
       end
       
