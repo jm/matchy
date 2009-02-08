@@ -106,4 +106,37 @@ class TestErrorExpectations < Test::Unit::TestCase
     
     obj.negative_failure_message.should =~ /Expected #<(.*)> to not throw :fail./
   end
+  
+  def test_string_argument_message
+    lambda {raise "message"}.should raise_error("message")
+  end
+  
+  def test_string_argument_message_fails_no_error
+    lambda do
+      lambda { 1 }.should raise_error("message")
+      
+    end.should raise_error
+  end
+  
+  def test_string_argument_message_fails_wrong_message
+    lambda do
+      lambda { raise "other message" }.should raise_error("message")
+    end.should raise_error
+  end
+  
+  def test_regexp_argument_message
+    lambda {raise "message"}.should raise_error(/essa/)
+  end
+  
+  def test_regexp_argument_message_fails_no_error
+    lambda do
+      lambda { 1 }.should raise_error(/essa/)
+    end.should raise_error
+  end
+  
+  def test_regexp_argument_message_fails_wrong_message
+    lambda do
+      lambda { raise "other message" }.should raise_error(/abc/)
+    end.should raise_error(/matching/)
+  end
 end

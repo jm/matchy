@@ -1,11 +1,11 @@
 module Matchy
   module MatcherBuilder
     def build_matcher(matcher_name=nil, args=[], &block)
-      #args = [args] #unless args.kind_of?(Array)
       match_block = lambda do |actual, matcher|
         block.call(actual, matcher, args)
       end
       body = lambda do |klass|
+        include Test::Unit::Assertions
         @matcher_name = matcher_name.to_s
         def self.matcher_name
           @matcher_name
@@ -30,16 +30,18 @@ module Matchy
           @negative_msg ||= "Matching with '#{matcher_name}' passed, although it should_not match."
           @match_block.call(given, self)
         end
-
-        def failure_message
-          self.positive_msg
+        
+        def fail!(which)
+          @test_case.flunk(which ? failure_message : negative_failure_message)
         end
 
-        def negative_failure_message
-          self.negative_msg
+        def pass!(which)
+          @test_case.assert true
         end
+        alias_method :failure_message, :positive_msg
+        alias_method :negative_failure_message, :negative_msg
       end
-      Class.new(Matchy::Expectations::Base, &body).new(match_block, self)
+      Class.new(&body).new(match_block, self)
     end
   end
 end

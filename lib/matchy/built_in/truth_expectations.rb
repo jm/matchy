@@ -11,11 +11,10 @@ module Matchy
       #
       def be(*obj)
         build_matcher(:be, obj) do |receiver, matcher, args|
-          @receiver = receiver
-          @expected = args[0]
-          matcher.positive_msg = "Expected #{@receiver.inspect} to be #{@expected.inspect}."
-          matcher.negative_msg = "Expected #{@receiver.inspect} to not be #{@expected.inspect}."
-          @expected == @receiver
+          @receiver, expected = receiver, args[0]
+          matcher.positive_msg = "Expected #{@receiver.inspect} to be #{expected.inspect}."
+          matcher.negative_msg = "Expected #{@receiver.inspect} to not be #{expected.inspect}."
+          expected == @receiver
         end
       end
       
@@ -26,13 +25,7 @@ module Matchy
       #   "hello".should be_kind_of(String)
       #   3.should be_kind_of(Fixnum)
       def be_kind_of(*klass)
-        build_matcher(:be_kind_of, klass) do |receiver, matcher, args|
-          @receiver = receiver
-          @expected = args[0]
-          matcher.positive_msg = "Expected #{@receiver.inspect} to be kind of #{@expected.inspect}."
-          matcher.negative_msg = "Expected #{@receiver.inspect} to not be kind of #{@expected.inspect}."
-          @receiver.kind_of?(@expected)
-        end
+        ask_for(:kind_of, :with_arg => klass)
       end
       
       # Checks if the given object is within a given object and delta.
@@ -44,12 +37,10 @@ module Matchy
       #
       def be_close(obj, delta = 0.3)
         build_matcher(:be_close, [obj, delta]) do |receiver, matcher, args|
-          @receiver = receiver
-          @expected = args[0]
-          @delta = args[1]
-          matcher.positive_msg = "Expected #{@receiver.inspect} to be close to #{@expected.inspect} (delta: #{@delta})."
-          matcher.negative_msg = "Expected #{@receiver.inspect} to not be close to #{@expected.inspect} (delta: #{@delta})."
-          (@receiver - @expected).abs < @delta
+          @receiver, expected, delta = receiver, args[0], args[1]
+          matcher.positive_msg = "Expected #{@receiver.inspect} to be close to #{expected.inspect} (delta: #{delta})."
+          matcher.negative_msg = "Expected #{@receiver.inspect} to not be close to #{expected.inspect} (delta: #{delta})."
+          (@receiver - expected).abs < delta
         end
       end
       
@@ -61,12 +52,7 @@ module Matchy
       #   found_user.should exist
       #
       def exist
-        build_matcher(:exist) do |receiver, matcher, args|
-          @receiver = receiver
-          matcher.positive_msg = "Expected #{@receiver.inspect} to exist."
-          matcher.negative_msg = "Expected #{@receiver.inspect} to not exist."
-          receiver.exist?
-        end
+        ask_for(:exist, :with_arg => nil)
       end   
       
       # Calls +eql?+ on the given object (i.e., are the objects the same value?)
@@ -77,13 +63,7 @@ module Matchy
       #    (12 / 6).should eql(6)
       #
       def eql(*obj)
-        build_matcher(:eql, obj) do |receiver, matcher, args|
-          @receiver = receiver
-          @expected = args[0]
-          matcher.positive_msg = "Expected #{@receiver.inspect} to eql #{@expected.inspect}."
-          matcher.negative_msg = "Expected #{@receiver.inspect} to not eql #{@expected.inspect}."
-          @expected.eql?(@receiver)
-        end
+        ask_for(:eql, :with_arg => obj)
       end
       
       # Calls +equal?+ on the given object (i.e., do the two objects have the same +object_id+?)
@@ -100,13 +80,7 @@ module Matchy
       #   x[0].should equal(y[0])
       #
       def equal(*obj)
-        build_matcher(:equal, obj) do |receiver, matcher, args|
-          @receiver = receiver
-          @expected = args[0]
-          matcher.positive_msg = "Expected #{@receiver.inspect} to equal #{@expected.inspect}."
-          matcher.negative_msg = "Expected #{@receiver.inspect} to not equal #{@expected.inspect}."
-          @expected.equal?(@receiver)
-        end
+        ask_for(:equal, :with_arg => obj)
       end
       
       # A last ditch way to implement your testing logic.  You probably shouldn't use this unless you
@@ -119,11 +93,10 @@ module Matchy
       #
       def satisfy(*obj)
         build_matcher(:satisfy, obj) do |receiver, matcher, args|
-          @receiver = receiver
-          @expected = args[0]
+          @receiver, expected = receiver, args[0]
           matcher.positive_msg = "Expected #{@receiver.inspect} to satisfy given block."
           matcher.negative_msg = "Expected #{@receiver.inspect} to not satisfy given block."
-          @expected.call(@receiver) == true
+          expected.call(@receiver) == true
         end
       end
       
@@ -134,13 +107,18 @@ module Matchy
       #   "foo".should respond_to(:length)
       #   {}.should respond_to(:has_key?)
       def respond_to(*meth)
-        build_matcher(:respond_to, meth) do |receiver, matcher, args|
-          @receiver = receiver
-          @expected = args[0]
-          matcher.positive_msg = "Expected #{@receiver.inspect} to respond to #{@expected.inspect}."
-          matcher.negative_msg = "Expected #{@receiver.inspect} to not respond to #{@expected.inspect}."
-          @receiver.respond_to?(@expected)
-        end
+        ask_for(:respond_to, :with_arg => meth)
+      end
+      
+      # Asks given for success?().
+      # This is necessary because Rails Integration::Session
+      # overides method_missing without grace.
+      #
+      # ==== Examples
+      #
+      #   @response.should be_success
+      def be_success
+        ask_for(:success, :with_arg => nil)
       end
 
       alias_method :old_missing, :method_missing
@@ -158,14 +136,23 @@ module Matchy
       def method_missing(name, *args, &block)
         if (name.to_s =~ /^be_(.+)/)
           build_matcher(name, args) do |receiver, matcher, args|
-            @receiver = receiver
-            
-            matcher.positive_msg = "Expected #{@receiver.inspect} to return true for #{$1}?."
-            matcher.negative_msg = "Expected #{@receiver.inspect} to return false for #{$1}?."
-            @receiver.send(($1 + "?").to_sym)
+            matcher.positive_msg = "Expected #{receiver.inspect} to return true for #{$1}?."
+            matcher.negative_msg = "Expected #{receiver.inspect} to return false for #{$1}?."
+            receiver.send(($1 + "?").to_sym)
           end
         else
           old_missing(name, *args, &block)
+        end
+      end
+      
+    private
+      def ask_for(sym, option={})
+        obj = option[:with_arg] || []
+        build_matcher(sym, obj) do |receiver, matcher, args|
+          expected, meth = args[0], (sym.to_s + "?" ).to_sym
+          matcher.positive_msg = "Expected #{receiver.inspect} to #{sym} #{(expected && expected.inspect) || ''}."
+          matcher.negative_msg = "Expected #{receiver.inspect} to not #{sym} #{(expected && expected.inspect) || ''}."
+          expected ? receiver.send(meth, expected) : receiver.send(meth)
         end
       end
     end

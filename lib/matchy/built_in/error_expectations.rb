@@ -10,21 +10,31 @@ module Matchy
       #   lambda { puts i_dont_exist }.should raise_error(NameError)
       #
       def raise_error(*obj)
-        build_matcher(:raise_error, obj) do |given, matcher, args|
+        build_matcher(:raise_error, obj) do |receiver, matcher, args|
+          @receiver = receiver
+          expected = args[0] || StandardError
           raised = false
           error = nil
           begin
-            given.call
+            @receiver.call
           rescue StandardError => e
             raised = true
             error = e
           end
-          extra = "but none was raised"
-          extra = "but #{error.class.name} was raised instead" if error
-          expected_error = args[0] || StandardError
-          matcher.positive_msg = "Expected #{given.inspect} to raise #{expected_error.name}, #{extra}."
-          matcher.negative_msg = "Expected #{given.inspect} to not raise #{expected_error.name}."
-          raised && error.class.ancestors.include?(expected_error)
+          
+          if expected.respond_to?(:ancestors) && expected.ancestors.include?(Exception)
+            extra = "but none was raised"
+            extra = "but #{error.class.name} was raised instead" if error
+            matcher.positive_msg = "Expected #{@receiver.inspect} to raise #{expected.name}, #{extra}."
+            matcher.negative_msg = "Expected #{@receiver.inspect} to not raise #{expected.name}."
+            comparison = (raised && error.class.ancestors.include?(expected))
+          else
+            message = error ? error.message : "none"
+            matcher.positive_msg = "Expected #{@receiver.inspect} to raise error with message matching '#{expected}', but '#{message}' was raised."
+            matcher.negative_msg = "Expected #{@receiver.inspect} to raise error with message not matching '#{expected}', but '#{message}' was raised."
+            comparison = (raised && (expected.kind_of?(Regexp) ? ((error.message =~ expected) ? true : false) : expected == error.message))
+          end
+          comparison
         end
       end
       

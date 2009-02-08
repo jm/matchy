@@ -7,15 +7,14 @@ module Matchy
     #   13.should == 13
     #   "hello".length.should_not == 2
     #
-    class OperatorExpectation < Base 
-      OPERATORS = ['==', '===', '=~', '>', '>=', '<', '<=']
+    class OperatorExpectation #< Base
+      include Test::Unit::Assertions
            
       def initialize(receiver, match)
-        @receiver = receiver
-        @match = match
+        @receiver, @match = receiver, match
       end
       
-      OPERATORS.each do |op|
+      ['==', '===', '=~', '>', '>=', '<', '<='].each do |op|
         define_method(op) do |expected|
           @expected = expected
           (@receiver.send(op,expected) ? true : false) == @match ? pass! : fail!(op)
