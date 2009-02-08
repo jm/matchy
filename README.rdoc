@@ -33,13 +33,13 @@ Hate writing assertions?  Need a little behavior-driven love in your tests?  The
 
 * Most of familiar RSpec Matchers are built in
 
-    *raise_error
+    # raise_error matcher
     lambda {raise}.should raise_error                              #pass
     lambda {raise MyCustomError}.should raise_error(MyCustomError) #pass
     lambda {raise "message"}.should raise_error("message")         #pass
     lambda {raise "message"}.should raise_error(/essa/)            #pass
 
-    *change
+    # change matcher
     lambda {@var+=1}.should change {@var}
     # passes
     lambda { }.should change {@var}
@@ -48,7 +48,7 @@ Hate writing assertions?  Need a little behavior-driven love in your tests?  The
     lambda {@var+=1}.should change {@var}.from(1).to(2)
     # passes
 
-    *be_something
+    # be_something matcher
     @obj.should be_something
     # passes if @obj.something? is true
 
@@ -58,7 +58,7 @@ Hate writing assertions?  Need a little behavior-driven love in your tests?  The
 
 * Create your own matchers
     
-    * nil_matcher (As a simple and quick example)
+    # nil_matcher (As a simple and quick example)
     def_matcher :be_nil do |receiver, matcher, args|
       receiver.nil?
     end
@@ -68,8 +68,8 @@ Hate writing assertions?  Need a little behavior-driven love in your tests?  The
     'notnil'.should be_nil       # fails
     'notnil'.should_not be_nil   # pass
 
-    * have(n).somethings matcher (a little bit more complex)
-    def_matcher :have do |receiver, matcher, args|
+    # have(n).somethings matcher (A little bit more complex)
+    def_matcher :have do |receiver, matcher, args|  
 		  count = args[0]
 		  something = matcher.msgs[0].name
 		  actual = receiver.send(something).length
