@@ -23,9 +23,8 @@ module Matchy
           end
           
           if expected.respond_to?(:ancestors) && expected.ancestors.include?(Exception)
-            extra = "but none was raised"
-            extra = "but #{error.class.name} was raised instead" if error
-            matcher.positive_msg = "Expected #{@receiver.inspect} to raise #{expected.name}, #{extra}."
+            matcher.positive_msg = "Expected #{@receiver.inspect} to raise #{expected.name}, " + 
+              (error ? "but #{error.class.name} was raised instead." : "but none was raised.")
             matcher.negative_msg = "Expected #{@receiver.inspect} to not raise #{expected.name}."
             comparison = (raised && error.class.ancestors.include?(expected))
           else
@@ -46,22 +45,21 @@ module Matchy
       #   lambda { "not this time" }.should_not throw_symbol(:hello)
       #
       def throw_symbol(*obj)
-        build_matcher(:throw_symbol, obj) do |given, matcher, args|
-          raised = false
-          thrown_symbol = nil
+        build_matcher(:throw_symbol, obj) do |receiver, matcher, args|
+          raised, thrown_symbol, expected = false, nil, args[0]
           begin
-            given.call
+            receiver.call
           rescue NameError => e
             raise e unless e.message =~ /uncaught throw/
             raised = true
-            thrown_symbol = e.name.to_sym
+            thrown_symbol = e.name.to_sym if e.respond_to?(:name)
+          rescue ArgumentError => e
+            raise e unless e.message =~ /uncaught throw/
+            thrown_symbol = e.message.match(/uncaught throw :(.+)/)[1].to_sym
           end
-          expected = args[0]
-          matcher.positive_msg = <<-END
-Expected #{given.inspect} to throw :#{expected}, but \
-#{thrown_symbol ? ':' + thrown_symbol.to_s + ' was thrown instead' : 'no symbol was thrown'}.
-END
-          matcher.negative_msg = "Expected #{given.inspect} to not throw :#{expected}."
+          matcher.positive_msg = "Expected #{receiver.inspect} to throw :#{expected}, but " +
+            "#{thrown_symbol ? ':' + thrown_symbol.to_s + ' was thrown instead' : 'no symbol was thrown'}."
+          matcher.negative_msg = "Expected #{receiver.inspect} to not throw :#{expected}."
           expected == thrown_symbol
         end
       end      

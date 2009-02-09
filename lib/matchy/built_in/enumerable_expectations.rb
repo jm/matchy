@@ -12,11 +12,7 @@ module Matchy
       #   ['a', 'b', 'c'].should include('a', 'c')
       #
       def include(*obj)
-        build_matcher(:include, obj) do |given, matcher, args|
-          matcher.positive_msg = "Expected #{given.inspect} to include #{args.inspect}."
-          matcher.negative_msg = "Expected #{given.inspect} to not include #{args.inspect}."
-          args.inject(true) {|m,o| m && given.include?(o) }
-        end
+        _clude(:include, obj)
       end
       
       # Expects the receiver to exclude the given object(s). You can provide
@@ -29,10 +25,15 @@ module Matchy
       #   ['a', 'b', 'c'].should exclude('e', 'f', 'g')
       #
       def exclude(*obj)
-        build_matcher(:exlude, obj) do |given, matcher, args|
-          matcher.positive_msg = "Expected #{given.inspect} to exclude #{args.inspect}."
-          matcher.negative_msg = "Expected #{given.inspect} to not exclude #{args.inspect}."
-          args.inject(true) {|m,o| m && !given.include?(o) }
+        _clude(:exclude, obj)
+      end
+      
+      private
+      def _clude(sym, obj)
+        build_matcher(sym, obj) do |given, matcher, args|
+          matcher.positive_msg = "Expected #{given.inspect} to #{sym} #{args.inspect}."
+          matcher.negative_msg = "Expected #{given.inspect} to not #{sym} #{args.inspect}."
+          args.inject(true) {|m,o| m && (given.include?(o) == (sym == :include)) }
         end
       end
     end

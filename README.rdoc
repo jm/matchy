@@ -3,7 +3,7 @@
 * http://github.com/mhennemeyer/matchy
 
 == DESCRIPTION:
-"A 300loc refactoring of Jeremy Mcanally's Matchy. Original Description: 
+A 300loc refactoring of Jeremy Mcanally's Matchy. Original Description: 
 Hate writing assertions?  Need a little behavior-driven love in your tests?  Then matchy is for you.
 
 == FEATURES/PROBLEMS:
@@ -34,10 +34,10 @@ Hate writing assertions?  Need a little behavior-driven love in your tests?  The
 * Most of familiar RSpec Matchers are built in
 
     # raise_error matcher
-    lambda {raise}.should raise_error                              #pass
-    lambda {raise MyCustomError}.should raise_error(MyCustomError) #pass
-    lambda {raise "message"}.should raise_error("message")         #pass
-    lambda {raise "message"}.should raise_error(/essa/)            #pass
+    lambda {raise}.should raise_error                                  #pass
+    lambda {raise MyCustomError.new}.should raise_error(MyCustomError) #pass
+    lambda {raise "message"}.should raise_error("message")             #pass
+    lambda {raise "message"}.should raise_error(/essa/)                #pass
 
     # change matcher
     lambda {@var+=1}.should change {@var}

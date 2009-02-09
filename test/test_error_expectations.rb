@@ -58,11 +58,13 @@ class TestErrorExpectations < Test::Unit::TestCase
   end
   
   def test_negative_throws_symbol_fails_with_different_symbol
+    
     lambda{
       lambda {
         throw :fail
       }.should_not throw_symbol(:fail)
     }.should raise_error(Test::Unit::AssertionFailedError)
+  
   end
   
   def test_error_fail_message

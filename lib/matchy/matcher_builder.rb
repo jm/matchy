@@ -14,8 +14,7 @@ module Matchy
         attr_accessor :positive_msg, :negative_msg, :msgs
         attr_reader :matcher_name
         def initialize match_block, test_case
-          @test_case = test_case
-          @match_block = match_block
+          @match_block, @test_case = match_block, test_case
           @matcher_name = self.class.matcher_name
         end
 
@@ -41,6 +40,7 @@ module Matchy
         alias_method :failure_message, :positive_msg
         alias_method :negative_failure_message, :negative_msg
       end
+      p self
       Class.new(&body).new(match_block, self)
     end
   end
