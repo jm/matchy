@@ -1,8 +1,27 @@
 $:.unshift(File.dirname(__FILE__)) unless
   $:.include?(File.dirname(__FILE__)) || $:.include?(File.expand_path(File.dirname(__FILE__)))
 
+# Matchy should work with either test/unit 
+# or minitest
+module Matchy
+  def self.mu?
+    # This needs to be better.
+    # How can we decide if we really have a 
+    # suite of MiniTest Tests?
+    # Rails for example defines MiniTest, so this check for
+    # defined?(MiniTest) would be malicious
+    defined?(MiniTest)
+  end
+  def self.assertions_module
+    mu? ? MiniTest::Assertions : Test::Unit::Assertions
+  end
+  def self.test_case_class
+    mu? ? MiniTest::Unit::TestCase : Test::Unit::TestCase
+  end
+end
+
 require 'rubygems'
-require 'test/unit'
+require 'test/unit' unless Matchy.mu?
 
 require 'matchy/expectation_builder'
 require 'matchy/modals'
@@ -16,10 +35,11 @@ require 'matchy/built_in/truth_expectations'
 require 'matchy/built_in/operator_expectations'
 require 'matchy/built_in/change_expectations'
 
-# Evil test/unit hack.
+
+# Evil hack.
 # Track the current testcase and 
 # provide it to the operator matchers.
-class Test::Unit::TestCase
+Matchy.test_case_class.class_eval do
   alias_method :old_run_method_aliased_by_matchy_300, :run
   def run(whatever, *args, &block)
     $current_test_case = self
@@ -27,7 +47,7 @@ class Test::Unit::TestCase
   end
 end
 
-Test::Unit::TestCase.send(:include, Matchy::Expectations::TestCaseExtensions)
+Matchy.test_case_class.send(:include, Matchy::Expectations::TestCaseExtensions)
 
 include Matchy::DefMatcher
 

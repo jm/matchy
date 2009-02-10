@@ -5,7 +5,7 @@ module Matchy
         block.call(actual, matcher, args)
       end
       body = lambda do |klass|
-        include Test::Unit::Assertions
+        include Matchy.assertions_module
         @matcher_name = matcher_name.to_s
         def self.matcher_name
           @matcher_name
