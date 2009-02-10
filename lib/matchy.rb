@@ -3,25 +3,28 @@ $:.unshift(File.dirname(__FILE__)) unless
 
 # Matchy should work with either test/unit 
 # or minitest
+
 module Matchy
-  def self.mu?
+  def self.minitest?
     # This needs to be better.
     # How can we decide if we really have a 
     # suite of MiniTest Tests?
-    # Rails for example defines MiniTest, so this check for
+    # Rails for example defines MiniTest, so only check for
     # defined?(MiniTest) would be malicious
-    defined?(MiniTest)
+    defined?(MiniTest) && 
+      defined?(MiniTest::Assertions) && 
+        (!defined?(Test::Unit::TestCase) || !(Test::Unit::TestCase < MiniTest::Assertions))
   end
   def self.assertions_module
-    mu? ? MiniTest::Assertions : Test::Unit::Assertions
+    minitest? ? MiniTest::Assertions : Test::Unit::Assertions
   end
   def self.test_case_class
-    mu? ? MiniTest::Unit::TestCase : Test::Unit::TestCase
+    minitest? ? MiniTest::Unit::TestCase : Test::Unit::TestCase
   end
 end
 
 require 'rubygems'
-require 'test/unit' unless Matchy.mu?
+require 'test/unit' unless Matchy.minitest?
 
 require 'matchy/expectation_builder'
 require 'matchy/modals'
