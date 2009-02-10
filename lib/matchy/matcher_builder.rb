@@ -40,7 +40,6 @@ module Matchy
         alias_method :failure_message, :positive_msg
         alias_method :negative_failure_message, :negative_msg
       end
-      p self
       Class.new(&body).new(match_block, self)
     end
   end

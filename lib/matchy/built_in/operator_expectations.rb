@@ -23,7 +23,7 @@ module Matchy
       
       protected
       def pass!
-        assert true
+        defined?($current_test_case) ? $current_test_case.assert(true) : (assert true)
       end
       
       def fail!(operator)
