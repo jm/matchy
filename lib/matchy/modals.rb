@@ -9,7 +9,7 @@ module Matchy
     #   lambda { raise "u r doomed" }.should raise_error
     #
     def should(expectation = nil)
-      Matchy::ExpectationBuilder.build_expectation(:should, expectation, self)
+      Matchy::ExpectationBuilder.build_expectation(true, expectation, self)
     end
     
     alias :will :should
@@ -23,7 +23,7 @@ module Matchy
     #   lambda { "savd bai da bell" }.should_not raise_error
     #
     def should_not(expectation = nil)
-      Matchy::ExpectationBuilder.build_expectation(:should_not, expectation, self)
+      Matchy::ExpectationBuilder.build_expectation(false, expectation, self)
     end
     
     alias :will_not :should_not

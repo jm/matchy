@@ -1,19 +1,9 @@
 module Matchy
   module ExpectationBuilder
-    def self.build_expectation(type, exp, obj)
-      if exp
-        match_expectation(exp, (type == :should), obj)
-      else
-        return Matchy::Expectations::OperatorExpectation.new(obj, (type == :should))
-      end
-    end
-    
-    def self.match_expectation(expectation, match, obj)
-      if expectation.matches?(obj) != match
-        expectation.fail!(match)
-      else
-        expectation.pass!(match)
-      end
+    def self.build_expectation(match, exp, obj)
+      return Matchy::Expectations::OperatorExpectation.new(obj, match) unless exp
+      
+      (exp.matches?(obj) != match) ? exp.fail!(match) : exp.pass!(match)
     end
   end
 end

@@ -7,22 +7,22 @@ class TestExpectationBuilder < Test::Unit::TestCase
   end
   
   def test_should
-    exp = Matchy::ExpectationBuilder.build_expectation(:should, nil, @obj)
+    exp = Matchy::ExpectationBuilder.build_expectation(true, nil, @obj)
     exp.send(:==, @obj)
   end
   
   def test_should_fails
-    expect_1 = Matchy::ExpectationBuilder.build_expectation(:should, nil, 1)
+    expect_1 = Matchy::ExpectationBuilder.build_expectation(true, nil, 1)
     lambda {expect_1.send(:==, 2)}.should raise_error
   end
   
   def test_should_not
-    exp = Matchy::ExpectationBuilder.build_expectation(:should_not, nil, @obj)
+    exp = Matchy::ExpectationBuilder.build_expectation(false, nil, @obj)
     exp.send(:==, 1)
   end
   
   def test_should_not_fails
-    expect_not_1 = Matchy::ExpectationBuilder.build_expectation(:should_not, nil, 1)
+    expect_not_1 = Matchy::ExpectationBuilder.build_expectation(false, nil, 1)
     lambda {expect_not_1.send(:==, 1)}.should raise_error
   end
 end

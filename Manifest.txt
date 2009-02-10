@@ -13,6 +13,7 @@ config/hoe.rb
 config/requirements.rb
 lib/matchy.rb
 lib/matchy/version.rb
+lib/matchy/expectation_builder
 lib/matchy/modals.rb
 lib/matchy/def_matcher.rb
 lib/matchy/matcher_builder.rb
