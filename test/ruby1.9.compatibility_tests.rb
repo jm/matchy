@@ -1,8 +1,7 @@
 # Eval this file with ruby 1.9
 
 require 'test/unit'
-require "/Users/macbook/Projekte/matchy/lib/matchy.rb"
-
+require File.dirname(__FILE__) + '/../lib/matchy.rb'
 class TestAThing < Test::Unit::TestCase
   
   def setup
