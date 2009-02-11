@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name     = "matchy"
-  s.version  = "0.2.0"
+  s.version  = "0.3.1"
   s.date     = "2009-02-08"
   s.summary  = "RSpec-esque matchers for use in Test::Unit"
   s.email    = "mhennemeyer@gmail.com"
@@ -23,6 +23,7 @@ Gem::Specification.new do |s|
     "config/requirements.rb",
     "lib/matchy.rb",
     "lib/matchy/version.rb",
+    "lib/matchy/expectation_builder.rb",
     "lib/matchy/modals.rb",
     "lib/matchy/def_matcher.rb",
     "lib/matchy/matcher_builder.rb",
@@ -36,6 +37,8 @@ Gem::Specification.new do |s|
   
   s.test_files = [
     "test/test_change_expectation.rb",
+    "test/test_expectation_builder.rb",
+    "test/test_minitest_compatibility.rb",
     "test/test_def_matcher.rb",
     "test/test_enumerable_expectations.rb",
     "test/test_error_expectations.rb",
