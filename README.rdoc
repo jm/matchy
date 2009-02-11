@@ -1,9 +1,8 @@
 = matchy
 
-* http://github.com/mhennemeyer/matchy
+* http://github.com/jeremymcanally/matchy
 
 == DESCRIPTION:
-A 300loc refactoring of Jeremy Mcanally's Matchy. Original Description: 
 Hate writing assertions?  Need a little behavior-driven love in your tests?  Then matchy is for you.
 
 == FEATURES/PROBLEMS:
