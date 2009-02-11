@@ -1,4 +1,4 @@
-
+# This is here because OptionsParser is SO slow.
 def extract_path(argv)
   if argv[1].nil?
     if argv[0] =~ /-a/
@@ -21,6 +21,8 @@ end
 def all?
   ARGV.join =~ /-a/
 end
+
+
 
 def comment?(line)
   line =~ /^\s*#/

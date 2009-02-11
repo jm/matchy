@@ -18,16 +18,6 @@ module Matchy
         end
       end
       
-      # Checks if the given object is kind_of? the expected class
-      #
-      # ==== Examples
-      # 
-      #   "hello".should be_kind_of(String)
-      #   3.should be_kind_of(Fixnum)
-      def be_kind_of(*klass)
-        ask_for(:kind_of, :with_arg => klass)
-      end
-      
       # Checks if the given object is within a given object and delta.
       #
       # ==== Examples
@@ -122,7 +112,7 @@ module Matchy
       end
 
       alias_method :old_missing, :method_missing
-      # ==be_*something*
+      # ==be_*something(*args)
       #
       # ===This method_missing acts as a matcher builder. 
       # If a call to be_xyz() reaches this method_missing (say: obj.should be_xyz), 
@@ -131,15 +121,12 @@ module Matchy
       # ==== Examples
       #
       #   nil.should be_nil
+      #   17.should be_kind_of(Fixnum)
       #   obj.something? #=> true
       #   obj.should be_something
       def method_missing(name, *args, &block)
         if (name.to_s =~ /^be_(.+)/)
-          build_matcher(name, args) do |receiver, matcher, args|
-            matcher.positive_msg = "Expected #{receiver.inspect} to return true for #{$1}?."
-            matcher.negative_msg = "Expected #{receiver.inspect} to return false for #{$1}?."
-            receiver.send(($1 + "?").to_sym)
-          end
+          ask_for($1, :with_arg => args)
         else
           old_missing(name, *args, &block)
         end
@@ -147,11 +134,10 @@ module Matchy
       
     private
       def ask_for(sym, option={})
-        obj = option[:with_arg] || []
-        build_matcher(sym, obj) do |receiver, matcher, args|
+        build_matcher(sym, (option[:with_arg] || [])) do |receiver, matcher, args|
           expected, meth = args[0], (sym.to_s + "?" ).to_sym
-          matcher.positive_msg = "Expected #{receiver.inspect} to #{sym} #{(expected && expected.inspect) || ''}."
-          matcher.negative_msg = "Expected #{receiver.inspect} to not #{sym} #{(expected && expected.inspect) || ''}."
+          matcher.positive_msg = "Expected #{receiver.inspect} to return true for #{sym}?, with '#{(expected && expected.inspect) || 'no args'}'."
+          matcher.negative_msg = "Expected #{receiver.inspect} to not return true for #{sym}?, with '#{(expected && expected.inspect) || 'no args'}'."
           expected ? receiver.send(meth, expected) : receiver.send(meth)
         end
       end

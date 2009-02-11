@@ -3,7 +3,6 @@ $:.unshift(File.dirname(__FILE__)) unless
 
 # Matchy should work with either test/unit 
 # or minitest
-
 module Matchy
   def self.minitest?
     # This needs to be better.
@@ -11,8 +10,7 @@ module Matchy
     # suite of MiniTest Tests?
     # Rails for example defines MiniTest, so only check for
     # defined?(MiniTest) would be malicious
-    defined?(MiniTest) && 
-      defined?(MiniTest::Assertions) && 
+    defined?(MiniTest) && defined?(MiniTest::Assertions) && 
         (!defined?(Test::Unit::TestCase) || !(Test::Unit::TestCase < MiniTest::Assertions))
   end
   def self.assertions_module
@@ -39,14 +37,14 @@ require 'matchy/built_in/operator_expectations'
 require 'matchy/built_in/change_expectations'
 
 
-# Evil hack.
+# Hack of Evil.
 # Track the current testcase and 
 # provide it to the operator matchers.
 Matchy.test_case_class.class_eval do
-  alias_method :old_run_method_aliased_by_matchy_300, :run
+  alias_method :old_run_method_aliased_by_matchy, :run
   def run(whatever, *args, &block)
     $current_test_case = self
-    old_run_method_aliased_by_matchy_300(whatever, *args, &block)
+    old_run_method_aliased_by_matchy(whatever, *args, &block)
   end
 end
 

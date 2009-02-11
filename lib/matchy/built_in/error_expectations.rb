@@ -11,26 +11,24 @@ module Matchy
       #
       def raise_error(*obj)
         build_matcher(:raise_error, obj) do |receiver, matcher, args|
-          @receiver = receiver
-          expected = args[0] || StandardError
+          expected = args[0] || Exception
           raised = false
           error = nil
           begin
-            @receiver.call
-          rescue StandardError => e
+            receiver.call
+          rescue Exception => e
             raised = true
             error = e
           end
-          
           if expected.respond_to?(:ancestors) && expected.ancestors.include?(Exception)
-            matcher.positive_msg = "Expected #{@receiver.inspect} to raise #{expected.name}, " + 
+            matcher.positive_msg = "Expected #{receiver.inspect} to raise #{expected.name}, " + 
               (error ? "but #{error.class.name} was raised instead." : "but none was raised.")
-            matcher.negative_msg = "Expected #{@receiver.inspect} to not raise #{expected.name}."
+            matcher.negative_msg = "Expected #{receiver.inspect} to not raise #{expected.name}."
             comparison = (raised && error.class.ancestors.include?(expected))
           else
             message = error ? error.message : "none"
-            matcher.positive_msg = "Expected #{@receiver.inspect} to raise error with message matching '#{expected}', but '#{message}' was raised."
-            matcher.negative_msg = "Expected #{@receiver.inspect} to raise error with message not matching '#{expected}', but '#{message}' was raised."
+            matcher.positive_msg = "Expected #{receiver.inspect} to raise error with message matching '#{expected}', but '#{message}' was raised."
+            matcher.negative_msg = "Expected #{receiver.inspect} to raise error with message not matching '#{expected}', but '#{message}' was raised."
             comparison = (raised && (expected.kind_of?(Regexp) ? ((error.message =~ expected) ? true : false) : expected == error.message))
           end
           comparison

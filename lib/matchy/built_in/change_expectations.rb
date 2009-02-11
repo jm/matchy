@@ -14,7 +14,7 @@ module Matchy
           comparison = after != before
           if list = matcher.msgs
             comparison = case list[0].name
-              # todo provide meaningful messages
+              # todo: provide meaningful messages
             when :by          then (after == before + list[0].args[0] || after == before - list[0].args[0])
             when :by_at_least then (after >= before + list[0].args[0] || after <= before - list[0].args[0])
             when :by_at_most  then (after <= before + list[0].args[0] && after >= before - list[0].args[0])

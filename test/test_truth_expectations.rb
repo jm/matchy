@@ -148,42 +148,42 @@ class TestTruthExpectations < Test::Unit::TestCase
     obj = equal(4)
     obj.matches?(5)
     
-    obj.failure_message.should be("Expected 5 to equal 4.")
+    obj.failure_message.should be("Expected 5 to return true for equal?, with '4'.")
   end
   
   def test_equal_negative_fail_message
     obj = equal(5)
     obj.matches?(5)
     
-    obj.negative_failure_message.should be("Expected 5 to not equal 5.")
+    obj.negative_failure_message.should be("Expected 5 to not return true for equal?, with '5'.")
   end
   
   def test_eql_fail_message
     obj = eql(4)
     obj.matches?(5)
     
-    obj.failure_message.should be("Expected 5 to eql 4.")
+    obj.failure_message.should be("Expected 5 to return true for eql?, with '4'.")
   end
   
   def test_eql_negative_fail_message_for_eql
     obj = eql(5)
     obj.matches?(5)
     
-    obj.negative_failure_message.should be("Expected 5 to not eql 5.")
+    obj.negative_failure_message.should be("Expected 5 to not return true for eql?, with '5'.")
   end
   
   def test_exist_fail_message
     obj = exist
     obj.matches?(Exister.new(false))
     
-    obj.failure_message.should =~ /Expected #<(.*)> to exist./
+    obj.failure_message.should =~ /Expected #<(.*)> to return true for exist?./
   end
   
   def test_exist_negative_fail_message
     obj = exist
     obj.matches?(Exister.new(true))
     
-    obj.negative_failure_message.should =~ /Expected #<(.*)> to not exist./
+    obj.negative_failure_message.should =~ /Expected #<(.*)> to not return true for exist?./
   end
   
   def test_be_close_fail_message
@@ -268,6 +268,7 @@ class TestTruthExpectations < Test::Unit::TestCase
     }.should raise_error(Test::Unit::AssertionFailedError)
   end
   
+  # be_something
   def test_positive_be_something_method_missing_pass
     def @obj.something?
       true
@@ -304,7 +305,7 @@ class TestTruthExpectations < Test::Unit::TestCase
     matcher_obj = be_something
     obj.should matcher_obj
     
-    matcher_obj.failure_message.should be("Expected \"foo\" to return true for something?.")
+    matcher_obj.failure_message.should be("Expected \"foo\" to return true for something?, with 'no args'.")
   end
   
   def test_be_something_method_missing_negative_fail_message
@@ -315,7 +316,58 @@ class TestTruthExpectations < Test::Unit::TestCase
     matcher_obj = be_something
     obj.should_not matcher_obj
     
-    matcher_obj.negative_failure_message.should be("Expected \"foo\" to return false for something?.")
+    matcher_obj.negative_failure_message.should =~ /Expected \"foo\" to not return true for something?/
+  end
+  
+  # be_something(arg)
+  def test_positive_be_something_with_arg_method_missing_pass
+    def @obj.something?(arg)
+      true
+    end
+    @obj.should be_something(1)
+  end
+  
+  def test_positive_be_something_with_arg_method_missing_fails
+    def @obj.something?(arg)
+      false
+    end
+    lambda {@obj.should be_something(1)}.should raise_error(Test::Unit::AssertionFailedError)
+  end
+  
+  def test_negative_be_something_method_missing_pass
+    def @obj.something?(arg)
+      false
+    end
+    @obj.should_not be_something(1)
+  end
+  
+  def test_negative_be_something_method_missing_fails
+    def @obj.something?(arg)
+      true
+    end
+    lambda {@obj.should_not be_something(1)}.should raise_error(Test::Unit::AssertionFailedError)
+  end
+  
+  def test_be_something_method_missing_fail_message
+    obj = "foo"
+    def obj.something?(arg)
+      true
+    end
+    matcher_obj = be_something(1)
+    obj.should matcher_obj
+    
+    matcher_obj.failure_message.should be("Expected \"foo\" to return true for something?, with '1'.")
+  end
+  
+  def test_be_something_method_missing_negative_fail_message
+    obj = "foo"
+    def obj.something?(arg)
+      false
+    end
+    matcher_obj = be_something(1)
+    obj.should_not matcher_obj
+    
+    matcher_obj.negative_failure_message.should be("Expected \"foo\" to not return true for something?, with '1'.")
   end
 
 end

@@ -1,5 +1,5 @@
 Gem::Specification.new do |s|
-  s.name     = "matchy300"
+  s.name     = "matchy"
   s.version  = "0.2.0"
   s.date     = "2009-02-08"
   s.summary  = "RSpec-esque matchers for use in Test::Unit"
